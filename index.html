@@ -88,11 +88,11 @@
         }
 
         .drag-image img {
-            height: 150%;
-            width: 150%;
-            object-fit: cover;
+            /* height: auto;
+            width: 100%; */
+            /*object-fit: cover; */
             border-radius: 5px;
-            object-position: center;
+            /* object-position: center; */
         }
 
         .image-wrapper {
@@ -179,16 +179,22 @@
             let validExtensions = ["image/jpeg", "image/jpg", "image/png"];
             if (validExtensions.includes(fileType)) {
                 let fileReader = new FileReader();
+                let imgObj = new Image();
                 fileReader.onload = () => {
-                    let fileURL = fileReader.result;
-                    let imgTag = `<img src="${fileURL}" alt="image" class="img-circle" id="mImg">`;
-                    imgWrapper.innerHTML = imgTag;
-
-                    var imgObj = document.querySelector(".img-circle");
+                    imgObj.src = fileReader.result;
+                    
+                    imgObj.onload = function () {
+                        w = this.width;
+                        h = this.height;
+                        
+                        imgWrapper.innerHTML = "";
+                        imgWrapper.append(imgObj)
+                    }
+                    
                     
                     // console.log(imgObj.style.left)
-                     moveImage(0,0);
-                     console.log(imgObj.getBoundingClientRect())
+                    moveImage(0,0);
+                    console.log(imgObj.getBoundingClientRect())
                 }
                 fileReader.readAsDataURL(file);
 
