@@ -10,7 +10,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
         @import url('https://use.fontawesome.com/releases/v5.7.2/css/all.css');
-        
+
 
         * {
             margin: 0;
@@ -58,8 +58,9 @@
             font-weight: 300;
             color: #fff;
         }
-        
-        .drag-image span, .drag-image p{
+
+        .drag-image span,
+        .drag-image p {
             font-size: 14px;
             font-weight: 300;
             color: #fff;
@@ -87,18 +88,24 @@
         }
 
         .drag-image img {
-            height: 100%;
-            width: 100%;
+            height: 150%;
+            width: 150%;
             object-fit: cover;
             border-radius: 5px;
+            object-position: center;
         }
-        .image-wrapper{
-            height: 300px!important;
-            width: 300px!important;
+
+        .image-wrapper {
+            height: 300px !important;
+            width: 300px !important;
             border-radius: 50%;
             border: 1px dashed #fff;
-            overflow: hidden!important;
+            overflow: hidden !important;
             cursor: pointer;
+        }
+
+        .print-btn {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -114,8 +121,8 @@
             <input type="file" hidden>
             <p>Tip: <i>Use your mouse to move the image!</i></p>
             <div class="image-wrapper">
-
             </div>
+            <button class="print-btn">Print The Circle Image</button>
         </div>
 
     </div>
@@ -159,7 +166,14 @@
             file = event.dataTransfer.files[0];
             viewfile();
         });
-
+        
+        function moveImage(x_pos, y_pos) {
+            var d = document.getElementById('mImg');
+            d.style.position = "relative";
+            d.style.left = x_pos + 'px';
+            d.style.top = y_pos + 'px';
+        }
+        
         function viewfile() {
             let fileType = file.type;
             let validExtensions = ["image/jpeg", "image/jpg", "image/png"];
@@ -167,10 +181,17 @@
                 let fileReader = new FileReader();
                 fileReader.onload = () => {
                     let fileURL = fileReader.result;
-                    let imgTag = `<img src="${fileURL}" alt="image">`;
+                    let imgTag = `<img src="${fileURL}" alt="image" class="img-circle" id="mImg">`;
                     imgWrapper.innerHTML = imgTag;
+
+                    var imgObj = document.querySelector(".img-circle");
+                    
+                    // console.log(imgObj.style.left)
+                     moveImage(0,0);
+                     console.log(imgObj.getBoundingClientRect())
                 }
                 fileReader.readAsDataURL(file);
+
             } else {
                 alert("This is not an Image File!");
                 dropArea.classList.remove("active");
