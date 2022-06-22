@@ -100,13 +100,46 @@
             width: 300px !important;
             border-radius: 50%;
             border: 1px dashed #fff;
-            overflow: hidden !important;
+            /* overflow: hidden !important; */
             cursor: pointer;
+            position: relative;
         }
 
         .print-btn {
             margin-top: 20px;
         }
+        .zoom-slide{
+            margin: 15px;
+            color: white;
+        }
+        .range-slider{
+            position: absolute;
+            top: 30px;
+            right:30px;
+            width: 30px;
+        }
+        .range-slider  .input-range {
+            -webkit-appearance: none;
+            height: 200px;
+            border-radius: 5px;
+            background: #ccc;
+            outline: none;
+            writing-mode: bt-lr; /* IE */
+            -webkit-appearance: slider-vertical; /* WebKit */
+        
+        }
+
+
+
+        .range-slider ::-moz-range-track {
+        background: #ccc;
+        border: 0;
+        }
+
+        input::-moz-focus-inner { 
+        border: 0; 
+        }
+
     </style>
 </head>
 
@@ -120,8 +153,17 @@
             <button>Browse File</button>
             <input type="file" hidden>
             <p>Tip: <i>Use your mouse to move the image!</i></p>
+            
+            
+            
+            
+            
             <div class="image-wrapper">
+                <div class="range-slider">
+                    <input class="input-range" orient="vertical" type="range" step="0.5" value="5" min="1" max="10">
+                </div> 
             </div>
+
             <button class="print-btn">Print The Circle Image</button>
         </div>
 
@@ -186,14 +228,18 @@
                     imgObj.onload = function () {
                         w = this.width;
                         h = this.height;
-                        
+                        this.style.width = w + "px"
+                        this.style.width = h + "px"
+                        this.style.marginTop = Math.round((300 - h)/2)+ "px";
+                        this.style.marginLeft = Math.round((300 - w)/2)+ "px";
                         imgWrapper.innerHTML = "";
                         imgWrapper.append(imgObj)
+
                     }
                     
                     
                     // console.log(imgObj.style.left)
-                    moveImage(0,0);
+                    // moveImage(0,0);
                     console.log(imgObj.getBoundingClientRect())
                 }
                 fileReader.readAsDataURL(file);
