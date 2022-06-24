@@ -256,6 +256,12 @@
     <script>
         var originalWidth = 0;
         var originalHeight = 0;
+        var currentWidth = 0;
+        var currentHeight = 0;
+        var currentTop = 0;
+        var currentLeft = 0;
+        var originalTop = 0;
+        var originalLeft = 0;
         const dropArea = document.querySelector(".drag-image"),
             dragText = dropArea.querySelector("h6"),
             button = dropArea.querySelector("button"),
@@ -297,13 +303,6 @@
             viewfile();
         });
 
-        function moveImage(x_pos, y_pos) {
-            var d = document.getElementById('mImg');
-            d.style.position = "relative";
-            d.style.left = x_pos + 'px';
-            d.style.top = y_pos + 'px';
-        }
-
         function viewfile() {
             let fileType = file.type;
             let validExtensions = ["image/jpeg", "image/jpg", "image/png"];
@@ -330,20 +329,27 @@
 
                         w = domImg.width;
                         h = domImg.height;
+                        
                         originalWidth = w;
                         originalHeight = h;
+                        currentWidth = w;
+                        currentHeight = h;
+                        originalTop = Math.round((300 - h) / 2);
+                        originalLeft =  Math.round((300 - w) / 2);
+                        currentTop = originalTop;
+                        currentLeft = originalLeft;
                         
-
                         domImg.style.width = w + "px"
                         domImg.style.height = h + "px"
-                        domImg.style.top = Math.round((300 - h) / 2) + "px";
-                        domImg.style.left = Math.round((300 - w) / 2) + "px";
+                        domImg.style.top = originalTop + "px";
+                        domImg.style.left = originalLeft + "px";
+
+                        
                         
                     }
 
 
-                    // console.log(imgObj.style.left)
-                    // moveImage(0,0);
+           
                     console.log(imgObj.getBoundingClientRect())
                 }
                 fileReader.readAsDataURL(file);
@@ -359,20 +365,31 @@
         });
 
         function zoomImage(level) {
-            // orginal h : 100%
-            // original w : 100%
-            // max level : 10
-            // calculate new widht and height based on level
-
             new_w = originalWidth * level / 10;
             new_h = originalHeight * level / 10;
             var domImg = document.querySelector('.imgObj');
             
             domImg.style.width = new_w + "px"
             domImg.style.height = new_h + "px"
-            domImg.style.top = Math.round((300 - new_h) / 2) + "px";
-            domImg.style.left = Math.round((300 - new_w) / 2) + "px";
+           
+            newTop = 150 - Math.round(new_h * ( (150 - currentTop) / currentHeight ) ) ;
+            newLeft = 150 - Math.round(new_w * ( ( 150 - currentLeft) / currentWidth) );  
+           
+            domImg.style.top = newTop  + "px" ;
+            domImg.style.left = newLeft + "px" ;
+            currentHeight = new_h;
+            currentWidth = new_w;
+            currentTop = newTop;
+            currentLeft = newLeft;
+            
 
+        }
+        function moveImage(top, left) {
+            var domImg = document.querySelector('.imgObj');
+            domImg.style.top = top + "px";
+            domImg.style.left = left + "px";      
+            currentTop = top;
+            currentLeft = left;      
         }
     </script>
 
