@@ -281,8 +281,9 @@
             dropArea.classList.add("active");
             viewfile();
         });
-
+        
         dropArea.addEventListener("dragover", (event) => {
+            if(isMouseDown) return true;
             event.preventDefault();
             dropArea.classList.add("active");
             dragText.textContent = "Release to Upload File";
@@ -290,11 +291,13 @@
 
 
         dropArea.addEventListener("dragleave", () => {
+            if(isMouseDown) return true;
             dropArea.classList.remove("active");
             dragText.textContent = "Drag & Drop to Upload File";
         });
 
         dropArea.addEventListener("drop", (event) => {
+            if(isMouseDown) return true;
             dropArea.classList.remove("active");
             dragText.textContent = "Drag & Drop to Upload File";
             event.preventDefault();
@@ -302,6 +305,43 @@
             file = event.dataTransfer.files[0];
             viewfile();
         });
+        var isMouseDown = false;
+        var currentMouseTop = 0;
+        var currentMouseLeft = 0;
+
+        imgWrapper.addEventListener("mousedown",(e) =>{
+           // e.stopPropagation();
+            event.preventDefault();
+            isMouseDown = true;
+            var rect = e.target.getBoundingClientRect();
+            currentMouseLeft = e.clientX - rect.left; 
+            currentMouseTop = e.clientY - rect.top;  
+            
+            console.log(currentMouseLeft)
+        });
+        imgWrapper.addEventListener("mouseup",(event) =>{
+            event.preventDefault();
+            currentMouseTop = 0;
+            currentMouseLeft = 0;
+            isMouseDown = false;
+            
+            
+        });
+        imgWrapper.addEventListener("mousemove",(e) =>{
+            
+            event.preventDefault();
+            if(isMouseDown){
+                var rect = e.target.getBoundingClientRect();
+                var newMouseLeft = e.clientX - rect.left; 
+                var newMouseTop = e.clientY - rect.top;  
+
+                diffTop = newMouseTop - currentMouseTop;
+                diffLeft = newMouseLeft - currentMouseTop;
+                currentMouseTop = newMouseTop;
+                currentMouseLeft = newMouseLeft;
+                moveImage(currentTop+diffTop, currentLeft+diffLeft);
+            }
+        })
 
         function viewfile() {
             let fileType = file.type;
@@ -315,13 +355,7 @@
                     imgObj.className = "imgObj";
 
                     imgObj.onload = function () {
-                        // w = this.width;
-                        // h = this.height;
-                        // originalWidth = w;
-                        // originalHeight = h;
-                        
-                        
-                    
+                                            
                         imgWrapper.innerHTML = "";
                         imgWrapper.append(imgObj)
                         
@@ -343,12 +377,8 @@
                         domImg.style.height = h + "px"
                         domImg.style.top = originalTop + "px";
                         domImg.style.left = originalLeft + "px";
-
-                        
                         
                     }
-
-
            
                     console.log(imgObj.getBoundingClientRect())
                 }
@@ -391,6 +421,8 @@
             currentTop = top;
             currentLeft = left;      
         }
+
+
     </script>
 
 </body>
