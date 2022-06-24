@@ -88,11 +88,12 @@
         }
 
         .drag-image img {
-            /* height: auto;
-            width: 100%; */
-            /*object-fit: cover; */
+            
             border-radius: 5px;
-            /* object-position: center; */
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            
         }
 
         .image-wrapper {
@@ -100,46 +101,131 @@
             width: 300px !important;
             border-radius: 50%;
             border: 1px dashed #fff;
-            /* overflow: hidden !important; */
+            overflow: hidden !important;
             cursor: pointer;
             position: relative;
+            margin: 0 auto;
         }
 
         .print-btn {
             margin-top: 20px;
         }
-        .zoom-slide{
+
+        /* 
+        .zoom-slide {
             margin: 15px;
             color: white;
-        }
-        .range-slider{
+        } */
+
+        .range-slider {
             position: absolute;
             top: 30px;
-            right:30px;
-            width: 30px;
+            right: 30px;
+            width: 15px;
         }
-        .range-slider  .input-range {
+
+        .range-slider .input-range {
             -webkit-appearance: none;
             height: 200px;
             border-radius: 5px;
             background: #ccc;
             outline: none;
-            writing-mode: bt-lr; /* IE */
-            -webkit-appearance: slider-vertical; /* WebKit */
-        
+            writing-mode: bt-lr;
+            /* IE */
+            -webkit-appearance: slider-vertical;
+            /* WebKit */
+
         }
 
 
 
         .range-slider ::-moz-range-track {
-        background: #ccc;
-        border: 0;
+            /* background: #ccc; */
+            border: 0;
         }
 
-        input::-moz-focus-inner { 
-        border: 0; 
+
+
+        input::-moz-focus-inner {
+            border: 0;
         }
 
+        #edit-zone {
+            width: 100%;
+            height: auto;
+            text-align: center;
+            position: relative;
+        }
+
+        input[type=range] {
+            height: 30px;
+            -webkit-appearance: none;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            /* width: 100%;
+			height: 10px; */
+            cursor: pointer;
+            animate: 0.2s;
+            box-shadow: 0px 0px 0px #000000;
+            background: #bac0e1;
+            border-radius: 25px;
+            border: 0px solid #000101;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            box-shadow: 0px 0px 0px #000000;
+            border: 0px solid #000000;
+            /* height: 20px;
+			width: 20px; */
+            border-radius: 50%;
+            background: rgb(118, 118, 255);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -3.5px;
+        }
+
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #bac0e1;
+        }
+
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            animate: 0.2s;
+            box-shadow: 0px 0px 0px #000000;
+            /* background: #4056d3; */
+            border-radius: 25px;
+            border: 0px solid #000101;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            box-shadow: 0px 0px 0px #000000;
+            border: 0px solid #000000;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: rgb(118, 118, 255);
+            cursor: pointer;
+        }
+
+        input[type=range]::-ms-thumb {
+            margin-top: 1px;
+            box-shadow: 0px 0px 0px #000000;
+            border: 0px solid #000000;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: red;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -153,16 +239,14 @@
             <button>Browse File</button>
             <input type="file" hidden>
             <p>Tip: <i>Use your mouse to move the image!</i></p>
-            
-            
-            
-            
-            
-            <div class="image-wrapper">
+            <div id="edit-zone">
+                <div class="image-wrapper">
+                </div>
                 <div class="range-slider">
-                    <input class="input-range" orient="vertical" type="range" step="0.5" value="5" min="1" max="10">
-                </div> 
+                    <input class="input-range" orient="vertical" type="range" step="any" value="10" min="1" max="10">
+                </div>
             </div>
+
 
             <button class="print-btn">Print The Circle Image</button>
         </div>
@@ -170,13 +254,17 @@
     </div>
 
     <script>
+        var originalWidth = 0;
+        var originalHeight = 0;
         const dropArea = document.querySelector(".drag-image"),
             dragText = dropArea.querySelector("h6"),
             button = dropArea.querySelector("button"),
             input = dropArea.querySelector("input"),
-            imgWrapper = document.querySelector(".image-wrapper");
+            imgWrapper = document.querySelector(".image-wrapper"),
+            zoomSlider = document.querySelector(".input-range");
+            
         let file;
-
+        
         button.onclick = () => {
             input.click();
         }
@@ -208,36 +296,52 @@
             file = event.dataTransfer.files[0];
             viewfile();
         });
-        
+
         function moveImage(x_pos, y_pos) {
             var d = document.getElementById('mImg');
             d.style.position = "relative";
             d.style.left = x_pos + 'px';
             d.style.top = y_pos + 'px';
         }
-        
+
         function viewfile() {
             let fileType = file.type;
             let validExtensions = ["image/jpeg", "image/jpg", "image/png"];
             if (validExtensions.includes(fileType)) {
                 let fileReader = new FileReader();
-                let imgObj = new Image();
+                
                 fileReader.onload = () => {
+                    let imgObj = new Image();
                     imgObj.src = fileReader.result;
-                    
+                    imgObj.className = "imgObj";
+
                     imgObj.onload = function () {
-                        w = this.width;
-                        h = this.height;
-                        this.style.width = w + "px"
-                        this.style.width = h + "px"
-                        this.style.marginTop = Math.round((300 - h)/2)+ "px";
-                        this.style.marginLeft = Math.round((300 - w)/2)+ "px";
+                        // w = this.width;
+                        // h = this.height;
+                        // originalWidth = w;
+                        // originalHeight = h;
+                        
+                        
+                    
                         imgWrapper.innerHTML = "";
                         imgWrapper.append(imgObj)
+                        
+                        var domImg = document.querySelector('.imgObj');
 
+                        w = domImg.width;
+                        h = domImg.height;
+                        originalWidth = w;
+                        originalHeight = h;
+                        
+
+                        domImg.style.width = w + "px"
+                        domImg.style.height = h + "px"
+                        domImg.style.top = Math.round((300 - h) / 2) + "px";
+                        domImg.style.left = Math.round((300 - w) / 2) + "px";
+                        
                     }
-                    
-                    
+
+
                     // console.log(imgObj.style.left)
                     // moveImage(0,0);
                     console.log(imgObj.getBoundingClientRect())
@@ -249,6 +353,26 @@
                 dropArea.classList.remove("active");
                 dragText.textContent = "Drag & Drop to Upload File";
             }
+        }
+        zoomSlider.addEventListener('change',function(){
+            zoomImage(this.value);
+        });
+
+        function zoomImage(level) {
+            // orginal h : 100%
+            // original w : 100%
+            // max level : 10
+            // calculate new widht and height based on level
+
+            new_w = originalWidth * level / 10;
+            new_h = originalHeight * level / 10;
+            var domImg = document.querySelector('.imgObj');
+            
+            domImg.style.width = new_w + "px"
+            domImg.style.height = new_h + "px"
+            domImg.style.top = Math.round((300 - new_h) / 2) + "px";
+            domImg.style.left = Math.round((300 - new_w) / 2) + "px";
+
         }
     </script>
 
