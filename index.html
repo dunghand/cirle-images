@@ -227,6 +227,8 @@
             cursor: pointer;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.2.61/jspdf.min.js"></script>
 </head>
 
 <body>
@@ -240,7 +242,8 @@
             <input type="file" hidden>
             <p>Tip: <i>Use your mouse to move the image!</i></p>
             <div id="edit-zone">
-                <div class="image-wrapper">
+                <div class="image-wrapper" id="imgwrp">
+                    ok
                 </div>
                 <div class="range-slider">
                     <input class="input-range" orient="vertical" type="range" step="any" value="10" min="1" max="10">
@@ -248,7 +251,8 @@
             </div>
 
 
-            <button class="print-btn">Print The Circle Image</button>
+            <button class="print-btn" onclick="imagePrint()">Print The Circle Image</button>
+            <button class="print-btn" onclick="saveDiv('imgwrp','circle')">Download PDF</button>
         </div>
 
     </div>
@@ -262,6 +266,7 @@
         var currentLeft = 0;
         var originalTop = 0;
         var originalLeft = 0;
+        var imageData;
         const dropArea = document.querySelector(".drag-image"),
             dragText = dropArea.querySelector("h6"),
             button = dropArea.querySelector("button"),
@@ -270,6 +275,7 @@
             zoomSlider = document.querySelector(".input-range");
             
         let file;
+
         
         button.onclick = () => {
             input.click();
@@ -351,7 +357,9 @@
                 
                 fileReader.onload = () => {
                     let imgObj = new Image();
+
                     imgObj.src = fileReader.result;
+                    imageData = fileReader.result;
                     imgObj.className = "imgObj";
 
                     imgObj.onload = function () {
@@ -423,6 +431,30 @@
         }
 
 
+
+        function imageSourcetoPrint(imageData) {
+            return "<html><head>"
+            +"<style>body{text-align:center}\n img{border-radius:50%;width:300px;height:300px}@page {size: A4;margin: 0;}\n @media print { html, body{width: 216mm;height:279mm;text-align:center;} img{ width: 25mm;height:25mm;border-radius:50%} }\n </style>"
+            +"<script>function step1(){\n" +
+                    "setTimeout('step2()', 10);}\n" +
+                    "function step2(){window.print();window.close()}\n" +
+                    "</scri" + "pt></head><body onload='step1()' class='page'>\n" +
+                    "<img src='" + imageData + "' /></body></html>";
+        }
+        function imagePrint() {
+            Pagelink = "about:blank";
+            var pwa = window.open(Pagelink, "_new");
+            pwa.document.open();
+            pwa.document.write(imageSourcetoPrint(imageData));
+            pwa.document.close();
+        }
+        var doc = new jsPDF();
+
+        function saveDiv(divId, title) {
+            doc.fromHTML(`<html><head><title>${title}</title></head><body>ok11</body></html>`);
+            doc.save('div.pdf');
+        }
+       
     </script>
 
 </body>
